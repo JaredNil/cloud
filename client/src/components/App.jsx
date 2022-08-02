@@ -32,9 +32,10 @@ function App() {
 					{isAuth &&
 						<Routes>
 							<Route
-
 								path="*"
-								element={<Disk />}></Route>
+								element={<Disk />}>
+
+							</Route>
 						</Routes>
 					}
 
