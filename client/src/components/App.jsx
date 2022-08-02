@@ -7,6 +7,7 @@ import Login from './authorization/Login';
 import { useSelector, useDispatch } from 'react-redux';
 import { useEffect } from 'react';
 import { auth } from './../actions/user';
+import Disk from './disk/Disk';
 
 function App() {
 	const isAuth = useSelector(state => state.user.isAuth)
@@ -21,13 +22,21 @@ function App() {
 			<div className="app">
 				<Navbar />
 				<div className="wrap">
+
 					{!isAuth &&
 						<Routes>
-							<Route path="/login" element={<Login />} />
-							<Route path="/registration" element={<Registration />} />
+							<Route path="/login" element={<Login />}></Route>
+							<Route path="/registration" element={<Registration />}></Route>
 						</Routes>
 					}
+					{isAuth &&
+						<Routes>
+							<Route
 
+								path="*"
+								element={<Disk />}></Route>
+						</Routes>
+					}
 
 				</div>
 			</div>

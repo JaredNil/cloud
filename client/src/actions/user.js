@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { setUser } from '../reducers/userReducer'
 import { store } from './../reducers/index';
+import { React } from 'react';
 
 
 
@@ -49,6 +50,7 @@ export const auth = () => {
 			)
 			store.dispatch(setUser(responce.data.user))
 			localStorage.setItem('token', responce.data.token)
+
 
 			console.log(responce.data);
 		} catch (error) {
