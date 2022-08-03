@@ -10,6 +10,7 @@ import { logout } from '../../reducers/userReducer';
 const Navbar = () => {
 	const isAuth = useSelector(state => state.user.isAuth)
 	const dispatch = useDispatch()
+	const hello = useSelector(state => state.user.currentUser.email)
 
 	return (
 		<div className="navbar">
@@ -20,7 +21,7 @@ const Navbar = () => {
 				</div>
 				<div className="navbar__introduce">
 					Hi,
-					<span> User</span>
+					<span> {(hello) ? hello : 'User'} </span>
 				</div>
 				<div className="navbar__tools">
 					<div className="navbar__find">
