@@ -11,12 +11,13 @@ const Disk = () => {
 	const dispatch = useDispatch()
 	const dirStack = useSelector(state => state.files.dirStack)
 	const [dragEnter, setDragEnter] = useState(false)
+	const [sort, setSort] = useState('type')
 
 	const currentDir = useSelector(state => state.files.currentDir)
 	useEffect(() => {
-		dispatch(getFiles(currentDir))
+		dispatch(getFiles(currentDir, sort))
 		// eslint-disable-next-line
-	}, [currentDir])
+	}, [currentDir, sort])
 
 	function showPopupHandler() {
 		dispatch(setPopupDisplay('flex'))
@@ -72,6 +73,11 @@ const Disk = () => {
 						onChange={(event) => fileUploadHandler(event)}
 						id='disk__upload-input' type="file" />
 				</div>
+				<select value={sort} onChange={e => setSort(e.target.value)} className="disk__select">
+					<option value="name">По имени</option>
+					<option value="type">По типу</option>
+					<option value="date">По дате</option>
+				</select>
 			</div>
 			<FileList />
 			<Popup />

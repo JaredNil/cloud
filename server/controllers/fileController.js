@@ -31,7 +31,24 @@ class fileController {
 	}
 	async getFile(req, res) {
 		try {
-			const files = await File.find({ user: req.user.id, parent: req.query.parent })
+			const { sort } = req.querry
+			let files
+			switch (sort) {
+				case 'name':
+					files = await File.find({ user: req.user.id, parent: req.query.parent }).sort({ name: 1 })
+					break
+				case 'type':
+					files = await File.find({ user: req.user.id, parent: req.query.parent }).sort({ type: 1 })
+					break
+				case 'date':
+					files = await File.find({ user: req.user.id, parent: req.query.parent }).sort({ date: 1 })
+					break
+				default:
+					console.log('default sorted')
+					files = await File.find({ user: req.user.id, parent: req.query.parent })
+					break
+			}
+
 			return res.json(files)
 		} catch (error) {
 			return res.status(500).json({ message: "Can not get Files" })
