@@ -5,6 +5,7 @@ import FileList from './fileList/FileList';
 import './disk.scss';
 import Popup from "./Popup";
 import { setPopupDisplay, setCurrentDir } from './../../reducers/fileReducer';
+import Uploader from './uploader/Uploader';
 
 const Disk = () => {
 	const dispatch = useDispatch()
@@ -65,7 +66,7 @@ const Disk = () => {
 						className="disk__upload-label"
 						htmlFor='disk__upload-input'
 					>
-						Загрузить файл as
+						Загрузить файл
 					</label>
 					<input className="disk__upload-input" multiple={true}
 						onChange={(event) => fileUploadHandler(event)}
@@ -74,6 +75,7 @@ const Disk = () => {
 			</div>
 			<FileList />
 			<Popup />
+			<Uploader />
 		</div>
 		:
 		<div className="drop-area"

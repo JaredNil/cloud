@@ -1,5 +1,7 @@
 import axios from 'axios'
-import { setFiles, addFile } from "../reducers/fileReducer";
+import { setFiles, addFile, deleteFileAction } from "../reducers/fileReducer";
+import { showUploader, addUploadFile, changeUploadFile } from "../reducers/uploadReducer";
+
 
 export function getFiles(dirId) {
 	return async dispatch => {
@@ -43,6 +45,10 @@ export function uploadFile(file, dirId) {
 			formData.append('file', file)
 			if (dirId) formData.append('parent', dirId)
 
+			const uploadFile = { name: file.name, progress: 0, id: Date.now() }
+			dispatch(showUploader())
+			dispatch(addUploadFile(uploadFile))
+
 			const response = await axios.post(
 				`http://localhost:27017/api/files/upload`,
 				formData,
@@ -52,8 +58,8 @@ export function uploadFile(file, dirId) {
 						const totalLength = progressEvent.lengthComputable ? progressEvent.total : progressEvent.target.getResponseHeader('content-length') || progressEvent.target.getResponseHeader('x-decompressed-content-length');
 						console.log('total', totalLength)
 						if (totalLength) {
-							let progress = Math.round((progressEvent.loaded * 100) / totalLength)
-							console.log(progress)
+							uploadFile.progress = Math.round((progressEvent.loaded * 100) / totalLength)
+							dispatch(changeUploadFile(uploadFile))
 						}
 					}
 				})
@@ -64,3 +70,50 @@ export function uploadFile(file, dirId) {
 		}
 	}
 }
+
+
+export async function downloadFile(file) {
+	const response = await fetch(
+		`http://localhost:3000/api/files/download?id=${file._id}`,
+		{
+			headers: {
+				"Access-Control-Allow-Origin": "http://localhost:3000/",
+				"Access-Control-Allow-Credentials": "true",
+				"Access-Control-Allow-Methods": "GET,HEAD,OPTIONS,POST,PUT",
+				"Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept, Authorization",
+				Authorization: `Bearer ${localStorage.getItem('token')}`
+			}
+		})
+	if (response.status === 200) {
+		const blob = await response.blob()
+		const downloadUrl = window.URL.createObjectURL(blob)
+		const link = document.createElement('a')
+		link.href = downloadUrl
+		link.download = file.name
+		document.body.appendChild(link)
+		link.click()
+		link.remove()
+	}
+}
+
+
+
+export function deleteFile(file) { // НЕ РАБОТАЕТ
+	return async dispatch => {
+		try {
+			const response = await axios.delete(
+				`http://localhost:27017/api/files?id=62eb0b3220952ccb0108e50e`,
+				{
+					'Content-Type': 'application/json',
+					'Accept': 'application/json',
+					'Authorization': `Bearer ${localStorage.getItem('token')}`
+				}
+			)
+			console.warn(response.data.message)
+			dispatch(deleteFileAction(file._id))
+		} catch (e) {
+			console.log(e.response)
+		}
+	}
+}
+
