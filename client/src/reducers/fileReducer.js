@@ -6,11 +6,16 @@ const SET_POPUP_DISPLAY = 'SET_POPUP_DISPLAY'
 const PUSH_TO_STACK = 'PUSH_TO_STACK'
 const POP_FROM_STACK = 'POP_FROM_STACK'
 
+const DELETE_FILE = 'DELETE_FILE'
+
+const SET_VIEW = 'SET_VIEW'
+
 const defaultState = {
 	files: [],
 	currentDir: null,
 	popupDisplay: 'none',
-	dirStack: []
+	dirStack: [],
+	view: 'list'
 }
 
 
@@ -29,7 +34,10 @@ export function fileReducer(state = defaultState, action) {
 			return { ...state, dirStack: [...state.dirStack, action.payload] }
 		case POP_FROM_STACK:
 			return { ...state, dirStack: [...state.dirStack, action.payload] }
-
+		case DELETE_FILE:
+			return { ...state, files: [...state.files.filter(file => file._id !== action.payload)] }
+		case SET_VIEW:
+			return { ...state, view: action.payload }
 		default:
 			return state
 	}
@@ -63,4 +71,14 @@ export const pushToStack = (dir) => ({
 export const popFromStack = (dir) => ({
 	type: POP_FROM_STACK,
 	payload: dir
+})
+
+export const deleteFileAction = (file) => ({
+	type: DELETE_FILE,
+	payload: file
+})
+
+export const setFileView = (payload) => ({
+	type: SET_VIEW,
+	payload
 })

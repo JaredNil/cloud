@@ -22,4 +22,42 @@
     grid-column-start: 6;
     justify-self: center;
   }
+  &__btn {
+	display: none;
+ }
+
+ &:hover &__date {
+	grid-column-start: 3;
+ }
+ &:hover &__size {
+	grid-column-start: 4;
+ }
+ &:hover &__download {
+	grid-column-start: 5;
+	display: block;
+ }
+ &:hover &__delete {
+	grid-column-start: 6;
+	display: block;
+ }
 }
+
+
+.file-plate {
+	width: 150px;
+	height: 150px;
+	cursor: pointer;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	&__img {
+	  height: 100px;
+	  width: 100px;
+	}
+	&__btns {
+	  display: none;
+	}
+	&:hover &__btns {
+	  display: flex;
+	}
+ }

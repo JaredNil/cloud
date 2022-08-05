@@ -4,18 +4,22 @@ import { getFiles, uploadFile } from './../../actions/file';
 import FileList from './fileList/FileList';
 import './disk.scss';
 import Popup from "./Popup";
-import { setPopupDisplay, setCurrentDir } from './../../reducers/fileReducer';
+import { setPopupDisplay, setCurrentDir, setFileView } from './../../reducers/fileReducer';
+import Uploader from './uploader/Uploader';
+
 
 const Disk = () => {
 	const dispatch = useDispatch()
 	const dirStack = useSelector(state => state.files.dirStack)
+	const loader = useSelector(state => state.app.loader)
 	const [dragEnter, setDragEnter] = useState(false)
+	const [sort, setSort] = useState('type')
 
 	const currentDir = useSelector(state => state.files.currentDir)
 	useEffect(() => {
-		dispatch(getFiles(currentDir))
+		dispatch(getFiles(currentDir, sort))
 		// eslint-disable-next-line
-	}, [currentDir])
+	}, [currentDir, sort])
 
 	function showPopupHandler() {
 		dispatch(setPopupDisplay('flex'))
@@ -51,6 +55,16 @@ const Disk = () => {
 	}
 
 
+	if (loader) {
+		return (
+			<div className="loader">
+				<div className="lds-dual-ring"></div>
+			</div>
+		)
+	}
+
+
+
 	return (!dragEnter ?
 		<div className='disk'
 			onDragEnter={dragEnterHandler}
@@ -65,15 +79,25 @@ const Disk = () => {
 						className="disk__upload-label"
 						htmlFor='disk__upload-input'
 					>
-						Загрузить файл as
+						Загрузить файл
 					</label>
 					<input className="disk__upload-input" multiple={true}
 						onChange={(event) => fileUploadHandler(event)}
 						id='disk__upload-input' type="file" />
+					<select value={sort}
+						onChange={(e) => setSort(e.target.value)}
+						className='disk__select'>
+						<option value="name">По имени</option>
+						<option value="type">По типу</option>
+						<option value="date">По дате</option>
+					</select>
+					<button className="disk__plate" onClick={() => dispatch(setFileView('plate'))}></button>
+					<button className="disk__list" onClick={() => dispatch(setFileView('list'))}></button>
 				</div>
 			</div>
 			<FileList />
 			<Popup />
+			<Uploader />
 		</div>
 		:
 		<div className="drop-area"
