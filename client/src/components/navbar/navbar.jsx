@@ -7,17 +7,24 @@ import './navbar.scss';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../../reducers/userReducer';
 import { searchFiles, getFiles } from '../../actions/file';
-
-import { showLoader, hideLoader } from '../../reducers/appReducer';
+import avatarDefault from '../../assets/img/avatar.svg'
+import { showLoader } from '../../reducers/appReducer';
+import { API_URL } from '../../config';
 
 const Navbar = () => {
 	const isAuth = useSelector(state => state.user.isAuth)
 	const dispatch = useDispatch()
 	const hello = useSelector(state => state.user.currentUser.email)
 	const currentDir = useSelector(state => state.files.currentDir)
+	const currentUser = useSelector(state => state.user.currentUser)
 
 	const [searchName, setSearchName] = useState('')
 	const [searchTimeout, setSearchTimeout] = useState(false)
+
+	const avatar = currentUser.avatar
+		? `${API_URL + currentUser.avatar}`
+		: avatarDefault
+
 
 	function searchChangeHandler(e) {
 		setSearchName(e.target.value)
@@ -37,10 +44,12 @@ const Navbar = () => {
 	return (
 		<div className="navbar">
 			<div className="container">
-				<div className="navbar__main">
-					<img src={cloud} alt="" />
-					<span>CLOUD</span>
-				</div>
+				<NavLink to={'/'} >
+					<div className="navbar__main">
+						<img src={cloud} alt="" />
+						<span>CLOUD</span>
+					</div>
+				</NavLink >
 				<div className="navbar__introduce">
 					Hi,
 					<span> {(hello) ? hello : 'User'} </span>
@@ -56,15 +65,21 @@ const Navbar = () => {
 							/>
 							<img src={find} alt="" />
 						</div>}
+
 					{!isAuth && <div className="navbar__login"><Link to="/login">Войти</Link></div>}
 					{!isAuth && <div className="navbar__registration"><NavLink to="/registration">Регистрация</NavLink></div>}
 					{isAuth && <div className="navbar__login" onClick={() => dispatch(logout())}>Выйти</div>}
+					{isAuth &&
+						<NavLink to={'/profile'}>
+							<img className='navbar__avatar' src={avatar} alt="" />
+						</NavLink>
+					}
 					<div className="navbar__setting">
 						<img src={setting} alt="" />
 					</div>
 				</div>
-			</div>
-		</div>
+			</div >
+		</div >
 	)
 }
 
