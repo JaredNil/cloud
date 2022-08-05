@@ -2,5 +2,6 @@
 	"serverPort": 27017,
 	"dbURL": "mongodb: //localhost:27017/",
 	"secretKey": "mern",
-	"filePath": "C:\\Users\\Dominic\\Desktop\\MAIN__FILES\\FOR_WEB\\cloud\\server\\files"
+	"filePath": "C:\\Users\\Dominic\\Desktop\\MAIN__FILES\\FOR_WEB\\cloud\\server\\files",
+	"staticPath": "C:\\Users\\Dominic\\Desktop\\MAIN__FILES\\FOR_WEB\\cloud\\server\\static"
 }

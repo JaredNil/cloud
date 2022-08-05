@@ -1,11 +1,14 @@
 import axios from 'axios'
+import { showLoader, hideLoader } from '../reducers/appReducer';
 import { setFiles, addFile, deleteFileAction } from "../reducers/fileReducer";
 import { showUploader, addUploadFile, changeUploadFile } from "../reducers/uploadReducer";
+
 
 
 export function getFiles(dirId, sort) {
 	return async dispatch => {
 		try {
+			dispatch(showLoader())
 
 			let url = `http://localhost:27017/api/files`
 			if (dirId) { url = `http://localhost:27017/api/files?parent=${dirId}` }
@@ -21,6 +24,8 @@ export function getFiles(dirId, sort) {
 			dispatch(setFiles(response.data))
 		} catch (e) {
 			alert(e.response.data)
+		} finally {
+			dispatch(hideLoader())
 		}
 	}
 }
@@ -83,16 +88,13 @@ export function uploadFile(file, dirId) {
 
 export async function downloadFile(file) {
 	const response = await fetch(
-		`http://localhost:3000/api/files/download?id=${file._id}`,
+		`http://localhost:27017/api/files/download?id=${file._id}`,
 		{
 			headers: {
-				"Access-Control-Allow-Origin": "http://localhost:3000/",
-				"Access-Control-Allow-Credentials": "true",
-				"Access-Control-Allow-Methods": "GET,HEAD,OPTIONS,POST,PUT",
-				"Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept, Authorization",
 				Authorization: `Bearer ${localStorage.getItem('token')}`
 			}
-		})
+		}
+	)
 	if (response.status === 200) {
 		const blob = await response.blob()
 		const downloadUrl = window.URL.createObjectURL(blob)
@@ -107,15 +109,15 @@ export async function downloadFile(file) {
 
 
 
-export function deleteFile(file) { // НЕ РАБОТАЕТ
+export function deleteFile(file) {
 	return async dispatch => {
 		try {
 			const response = await axios.delete(
-				`http://localhost:27017/api/files?id=62eb0b3220952ccb0108e50e`,
+				`http://localhost:27017/api/files?id=${file._id}`,
 				{
-					'Content-Type': 'application/json',
-					'Accept': 'application/json',
-					'Authorization': `Bearer ${localStorage.getItem('token')}`
+					headers: {
+						Authorization: `Bearer ${localStorage.getItem('token')}`
+					}
 				}
 			)
 			console.warn(response.data.message)
@@ -123,6 +125,28 @@ export function deleteFile(file) { // НЕ РАБОТАЕТ
 		} catch (e) {
 			console.log(e.response)
 		}
+	}
+}
+
+export function searchFiles(search) {
+	return async dispatch => {
+		try {
+			const response = await axios.get(
+				`http://localhost:27017/api/files/search?search=${search}`,
+				{
+					headers: {
+						Authorization: `Bearer ${localStorage.getItem('token')}`
+					}
+				}
+			)
+			dispatch(setFiles(response.data))
+
+		} catch (e) {
+			console.log(e.response)
+		} finally {
+			dispatch(hideLoader())
+		}
+
 	}
 }
 

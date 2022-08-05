@@ -4,12 +4,14 @@ import { getFiles, uploadFile } from './../../actions/file';
 import FileList from './fileList/FileList';
 import './disk.scss';
 import Popup from "./Popup";
-import { setPopupDisplay, setCurrentDir } from './../../reducers/fileReducer';
+import { setPopupDisplay, setCurrentDir, setFileView } from './../../reducers/fileReducer';
 import Uploader from './uploader/Uploader';
+
 
 const Disk = () => {
 	const dispatch = useDispatch()
 	const dirStack = useSelector(state => state.files.dirStack)
+	const loader = useSelector(state => state.app.loader)
 	const [dragEnter, setDragEnter] = useState(false)
 	const [sort, setSort] = useState('type')
 
@@ -53,6 +55,16 @@ const Disk = () => {
 	}
 
 
+	if (loader) {
+		return (
+			<div className="loader">
+				<div className="lds-dual-ring"></div>
+			</div>
+		)
+	}
+
+
+
 	return (!dragEnter ?
 		<div className='disk'
 			onDragEnter={dragEnterHandler}
@@ -79,6 +91,8 @@ const Disk = () => {
 						<option value="type">По типу</option>
 						<option value="date">По дате</option>
 					</select>
+					<button className="disk__plate" onClick={() => dispatch(setFileView('plate'))}></button>
+					<button className="disk__list" onClick={() => dispatch(setFileView('list'))}></button>
 				</div>
 			</div>
 			<FileList />

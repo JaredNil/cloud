@@ -14,6 +14,7 @@ const coreMiddleware = require('./middleware/core.middleware')
 app.use(fileUpload({}))
 app.use(coreMiddleware)
 app.use(express.json())
+app.use(express.static('static'))
 app.use("/api/auth", authRouter)
 app.use("/api/files", fileRouter)
 

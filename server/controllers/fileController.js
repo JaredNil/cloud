@@ -3,6 +3,7 @@ const User = require('../models/User')
 const File = require('../models/File')
 const config = require('config')
 const fs = require('fs')
+const Uuid = require('uuid')
 
 class fileController {
 	async createDir(req, res) {
@@ -120,12 +121,11 @@ class fileController {
 	async downloadFile(req, res) {
 		console.log('server downloadFile')
 		try {
-			const file = await File.findOne({ _id: req.querry.id, user: req.user.id })
-			const path = config.get('filePath') + `\\` + req.user.id + `\\` + file.path + `\\` + file.name
-			console.log(file, path)
-			if (fs.existsSync(path)) return res.download(path, file.name)
+			const file = await File.findOne({ _id: req.query.id, user: req.user.id })
+			const path = fileService.getPath(file)
 
-			returnres.status(400).json({ message: "Download error" })
+			if (fs.existsSync(path)) return res.download(path, file.name)
+			return res.status(400).json({ message: "Download error" })
 
 		} catch (e) {
 			res.status(500).json({ message: "Download error" })
@@ -135,23 +135,64 @@ class fileController {
 	async deleteFile(req, res) {
 		console.log('server deleteFile')
 		try {
-			const file = await File.findOne({ _id: req.query.id, user: req.user.id })
-			if (!file) {
+			const files = await File.findOne({ _id: req.query.id, user: req.user.id })
+			if (!files) {
 				return res.status(400).json({ message: 'file not found' })
 			}
-			fileService.deleteFile(file)
-			await file.remove()
+			fileService.deleteFile(files)
+			await files.remove()
 			return res.json({ message: 'File was deleted' })
 		} catch (e) {
 			console.log(e)
 			return res.status(400).json({ message: 'Dir is not empty' })
 		}
 	}
+
+	async searchFiles(req, res) {
+		console.log('searchFile')
+		try {
+			const searchName = req.query.search
+			let files = await File.find({ user: req.user.id })
+			files = files.filter(file => file.name.includes(searchName))
+			return res.json(files)
+		} catch (e) {
+			return res.status(400).json({ message: 'Search error' })
+		}
+	}
+
+	async uploadAvatar(req, res) {
+		console.log('uploadAvatar')
+		try {
+			const file = req.files.file
+			const user = await User.findById(req.user.id)
+			const avatarName = Uuid.v4() + ".jpg"
+
+			file.mv(config.get('staticPath') + "\\" + avatarName)
+			user.avatar = avatarName
+			await user.save()
+			return res.json(user)
+
+		} catch (e) {
+			console.log(e)
+			return res.json({ message: 'Upload avatar error' })
+		}
+	}
+
+	async deleteAvatar(req, res) {
+		console.log('deleteAvatar')
+		try {
+			const user = await User.findById(req.user.id)
+			fs.unlinkSync(config.get('staticPath') + "\\" + user.avatar)
+			user.avatar = null
+			await user.save()
+			return res.json(user)
+
+		} catch (e) {
+			console.log(e)
+			return res.json({ message: 'Delete avatar error' })
+		}
+	}
 }
-
-
-
-
 
 
 module.exports = new fileController()
