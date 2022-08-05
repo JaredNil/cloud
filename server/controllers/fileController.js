@@ -6,9 +6,12 @@ const fs = require('fs')
 
 class fileController {
 	async createDir(req, res) {
+		console.log('server createDir')
 		try {
 			const { name, type, parent } = req.body
+
 			const file = new File({ name, type, parent, user: req.user.id })
+
 			const parentFile = await File.findOne({ _id: parent })
 
 			if (!parentFile) {
@@ -16,6 +19,7 @@ class fileController {
 				await fileService.createDir(file)
 			} else {
 				file.path = `${parentFile.path}\\${file.name}`
+
 				await fileService.createDir(file)
 				parentFile.childs.push(file._id)
 				await parentFile.save()
@@ -30,8 +34,11 @@ class fileController {
 		}
 	}
 	async getFile(req, res) {
+		console.log('server getFile')
+
 		try {
 			const files = await File.find({ user: req.user.id, parent: req.query.parent })
+
 			return res.json(files)
 		} catch (error) {
 			return res.status(500).json({ message: "Can not get Files" })
@@ -39,6 +46,7 @@ class fileController {
 	}
 
 	async uploadFile(req, res) {
+		console.log('server uploadFile')
 		try {
 			const file = req.files.file
 			const parent = await File.findOne({ user: req.user.id, _id: req.body.parent })
@@ -60,7 +68,7 @@ class fileController {
 
 
 			if (fs.existsSync(path)) {
-				console.log('here')
+				console.log('File already exist')
 				return res.status(500).json({ message: 'File already exist' })
 			}
 
@@ -70,8 +78,10 @@ class fileController {
 
 			const type = file.name.split('.').pop()
 			let filePath = file.name
-			if (parent) return filePath = parent.path + `\\` + file.name
 
+
+			if (parent) { filePath = parent.path + `\\` + file.name }
+			console.log(type, filePath)
 			const dbFile = new File({
 				name: file.name,
 				type,
@@ -92,6 +102,7 @@ class fileController {
 	}
 
 	async downloadFile(req, res) {
+		console.log('server downloadFile')
 		try {
 			const file = await File.findOne({ _id: req.querry.id, user: req.user.id })
 			const path = config.get('filePath') + `\\` + req.user.id + `\\` + file.path + `\\` + file.name
@@ -106,6 +117,7 @@ class fileController {
 	}
 
 	async deleteFile(req, res) {
+		console.log('server deleteFile')
 		try {
 			const file = await File.findOne({ _id: req.query.id, user: req.user.id })
 			if (!file) {
